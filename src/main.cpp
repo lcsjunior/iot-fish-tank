@@ -8,7 +8,5 @@ void setup() {
 
 void loop() {
   Wifi.loop();
-  char buf[64];
-  Serial.println(DateTimeUtil.format(buf, DateFormatter::SIMPLE));
   delay(300);
 }
