@@ -10,7 +10,7 @@
 class DateTimeUtilClass {
 public:
   time_t now() const;
-  time_t uptimeSecs() const;
+  time_t uptime() const;
 };
 
 extern DateTimeUtilClass DateTimeUtil;
