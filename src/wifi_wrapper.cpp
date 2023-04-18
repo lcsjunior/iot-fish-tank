@@ -1,12 +1,6 @@
 #include "wifi_wrapper.h"
 
-static const char *ssid = SECRET_SSID;
-static const char *pass = SECRET_PASS;
-static const char *otaPass = OTA_PASS;
-static const char *myTz = "<-03>3";
-static const char *ntpServer = "pool.ntp.org";
-
-uint32_t WiFiWrapperClass::getChipId() { return ESP.getChipId(); }
+uint32_t WiFiWrapperClass::getChipId() const { return ESP.getChipId(); }
 
 void WiFiWrapperClass::begin() {
   WiFi.mode(WIFI_STA);
@@ -14,15 +8,15 @@ void WiFiWrapperClass::begin() {
   sprintf(_hostname, "esp8266-%06x", getChipId());
 #endif
   WiFi.setHostname(_hostname);
-  WiFi.begin(ssid, pass);
+  WiFi.begin(_ssid, _pass);
   Serial.print(F("Connecting"));
   while (WiFi.status() != WL_CONNECTED && millis() <= WIFI_CONNECT_TIMEOUT) {
     Serial.print(F("."));
     delay(500);
   }
-  configTzTime(myTz, ntpServer);
+  configTzTime(_myTz, _ntpServer);
   ArduinoOTA.setHostname((const char *)_hostname);
-  ArduinoOTA.setPassword((const char *)otaPass);
+  ArduinoOTA.setPassword((const char *)_otaPass);
   ArduinoOTA.begin();
 }
 
@@ -37,7 +31,7 @@ void WiFiWrapperClass::loop() {
       currentMillis - _wiFiRetryPreviousMillis >= WIFI_CONNECT_TIMEOUT) {
     Serial.println(F("Reconnecting to WiFi..."));
     WiFi.disconnect();
-    WiFi.begin(ssid, pass);
+    WiFi.begin(_ssid, _pass);
     _wiFiRetryPreviousMillis = currentMillis;
   }
   ArduinoOTA.handle();

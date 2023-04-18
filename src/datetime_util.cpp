@@ -1,34 +1,25 @@
 #include "datetime_util.h"
 
-time_t epoch;
-static const char *dateTimeFormat = "%A, %B %d %Y %H:%M:%S";
-static const char *millisFormat = "%02d:%02d:%02d.%03d";
+time_t DateTimeUtilClass::now() const { return time(nullptr); }
 
-time_t *now() {
-  time(&epoch);
-  return &epoch;
+time_t DateTimeUtilClass::uptimeSecs() const {
+  return (time_t)(millis() / 1000);
 }
 
-char *cdttime(time_t *t) {
-  struct tm *timeinfo;
-  timeinfo = localtime(t);
+char *DateTimeUtilClass::format(char *buf, const char *fmt) const {
   size_t len = 64;
-  char *buf = (char *)malloc(len);
-  strftime(buf, len, dateTimeFormat, timeinfo);
+  time_t t = now();
+  struct tm *timeinfo = localtime(&t);
+  strftime(buf, len, fmt, timeinfo);
   return buf;
 }
 
-char *cmillis() {
-  unsigned long durationInMillis = millis();
-  int ms = durationInMillis % 1000;
-  int sec = (durationInMillis / 1000) % 60;
-  int min = (durationInMillis / (1000 * 60)) % 60;
-  int hr = (durationInMillis / (1000 * 60 * 60)) /* % 24*/;
-  char *buf = (char *)malloc(32);
-  sprintf_P(buf, millisFormat, hr, min, sec, ms);
+char *DateTimeUtilClass::formatUTC(time_t *t, char *buf,
+                                   const char *fmt) const {
+  size_t len = 64;
+  struct tm *timeinfo = gmtime(t);
+  strftime(buf, len, fmt, timeinfo);
   return buf;
 }
 
-void printReadableLocalTime() { Serial.println(FPSTR(cdttime(now()))); }
-
-void printReadableMillis() { Serial.println(FPSTR(cmillis())); }
+DateTimeUtilClass DateTimeUtil;

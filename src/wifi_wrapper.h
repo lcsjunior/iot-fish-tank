@@ -11,17 +11,21 @@
 #include "datetime_util.h"
 
 #define SERIAL_BAUD_RATE 115200
-#define MILLIS_PER_SECOND 1000UL
 #define WIFI_CONNECT_TIMEOUT (MILLIS_PER_SECOND * 30)
 
 class WiFiWrapperClass {
 private:
+  const char *_ssid = SECRET_SSID;
+  const char *_pass = SECRET_PASS;
+  const char *_otaPass = OTA_PASS;
+  const char *_myTz = "<-03>3";
+  const char *_ntpServer = "pool.ntp.org";
+  char _hostname[64];
   unsigned long _wiFiRetryPreviousMillis = 0;
   bool _shouldReboot = false;
-  char _hostname[64];
 
 public:
-  static uint32_t getChipId();
+  uint32_t getChipId() const;
   void begin();
   void loop();
 };
