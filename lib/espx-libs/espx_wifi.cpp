@@ -77,11 +77,14 @@ void WifiClass::initAP() {
   Serial.print(F("AP IP Address:      "));
   Serial.println(WiFi.softAPIP());
 
+  Serial.print(F("SSID:               "));
+  Serial.println(WiFi.softAPSSID());
+
   Serial.print(F("AP MAC Address:     "));
   Serial.println(WiFi.softAPmacAddress());
 
-  Serial.print(F("SSID:               "));
-  Serial.println(WiFi.softAPSSID());
+  Serial.print(F("Board MAC Address:  "));
+  Serial.println(WiFi.macAddress());
 
   Serial.print(F("Channel:            "));
   Serial.println(WiFi.channel());
@@ -112,11 +115,11 @@ void WifiClass::initSTA() {
   Serial.print(F("IP Address:         "));
   Serial.println(WiFi.localIP());
 
-  Serial.print(F("Board MAC Address:  "));
-  Serial.println(WiFi.macAddress());
-
   Serial.print(F("Hostname:           "));
   Serial.println(WiFi.getHostname());
+
+  Serial.print(F("Board MAC Address:  "));
+  Serial.println(WiFi.macAddress());
 
   Serial.print(F("Wi-Fi Channel:      "));
   Serial.println(WiFi.channel());
