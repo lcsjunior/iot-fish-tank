@@ -35,7 +35,8 @@ struct_message outgoingReadings;
 struct_message incomingReadings;
 
 void printPairingData() {
-  Serial.printf_P("Pairing: msgType: %d, id: %d, channel: %d\n",
+  printLocalDateTime();
+  Serial.printf_P("\nPairing: msgType: %d, id: %d, channel: %d\n",
                   pairingData.msgType, pairingData.id, pairingData.channel);
 }
 
