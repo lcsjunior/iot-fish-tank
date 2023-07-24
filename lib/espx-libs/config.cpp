@@ -46,6 +46,10 @@ void printConfigFile() {
   Serial.println();
 }
 
-void convertToJson(const Config &src, JsonVariant dst) {}
+void convertToJson(const Config &src, JsonVariant dst) {
+  dst["channel"] = src.channel;
+}
 
-void convertFromJson(JsonVariantConst src, Config &dst) {}
+void convertFromJson(JsonVariantConst src, Config &dst) {
+  dst.channel = src["channel"];
+}

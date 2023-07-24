@@ -7,7 +7,9 @@
 
 #define JSON_DOC_SIZE 1024
 
-struct Config {};
+struct Config {
+  uint8_t channel = 0;
+};
 extern Config config;
 
 bool loadConfigFile();

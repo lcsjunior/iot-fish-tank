@@ -33,8 +33,9 @@ void printLocalDateTime() {
 
 void printMAC(const uint8_t *mac_addr) {
   char macStr[18];
-  snprintf(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x", mac_addr[0],
-           mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4], mac_addr[5]);
+  snprintf_P(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
+             mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4],
+             mac_addr[5]);
   Serial.print(macStr);
 }
 
@@ -60,11 +61,9 @@ uint32_t WifiClass::getChipId() const { return _chipId; }
 
 uint8_t WifiClass::getChannel() const { return _channel; }
 
-void WifiClass::setChannel(uint8_t channel) { _channel = channel; }
-
 void WifiClass::initAP() {
   char apSsid[32];
-  sprintf(apSsid, "ESPsoftAP-%06x", _chipId);
+  sprintf_P(apSsid, "ESPsoftAP-%06x", _chipId);
 
   Serial.print(F("Setting soft-AP configuration... "));
   Serial.println(WiFi.softAPConfig(apIP, apIP, subnet) ? F("Ready")
@@ -93,9 +92,9 @@ void WifiClass::initAP() {
 
 void WifiClass::initSTA() {
 #if defined(ESP8266)
-  sprintf(_hostname, "esp8266-%06x", _chipId);
+  sprintf_P(_hostname, "esp8266-%06x", _chipId);
 #else
-  sprintf(_hostname, "esp32-%06x", _chipId);
+  sprintf_P(_hostname, "esp32-%06x", _chipId);
 #endif
   WiFi.setHostname(_hostname);
   WiFi.begin(_ssid, _pass);
@@ -141,8 +140,8 @@ void WifiClass::loop() {
   }
   if (_isSTAEnabled) {
     if (!WiFi.isConnected() &&
-        (millis() - _wiFiRetryConnectLastTime) >= WIFI_CONNECT_TIMEOUT) {
-      _wiFiRetryConnectLastTime = millis();
+        (millis() - _lastWiFiRetryConnectTime) >= WIFI_CONNECT_TIMEOUT) {
+      _lastWiFiRetryConnectTime = millis();
       Serial.println(F("Reconnecting to WiFi..."));
       WiFi.disconnect();
       WiFi.begin(_ssid, _pass);

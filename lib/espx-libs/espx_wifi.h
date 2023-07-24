@@ -33,7 +33,7 @@ private:
   const char *_ntpServer = NTP_SERVER;
   const char *_tz = TZ;
   char _hostname[64];
-  unsigned long _wiFiRetryConnectLastTime = 0;
+  unsigned long _lastWiFiRetryConnectTime = 0;
   bool _shouldReboot = false;
   bool _isSTAEnabled = false;
   uint32_t _chipId = 0;
@@ -43,7 +43,6 @@ public:
   WifiClass();
   uint32_t getChipId() const;
   uint8_t getChannel() const;
-  void setChannel(uint8_t channel);
   void initAP();
   void initSTA();
   void loop();
