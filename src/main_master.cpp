@@ -14,7 +14,7 @@ void setup() {
   WiFi.mode(WIFI_AP_STA);
   Wifi.initAP();
   Wifi.initSTA();
-  initESPNOW();
+  Now.initESPNOW();
 }
 
 void loop() {

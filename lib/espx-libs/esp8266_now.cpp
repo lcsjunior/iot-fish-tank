@@ -1,5 +1,6 @@
 #include "esp8266_now.h"
 
+NowClass Now;
 uint8_t broadcastAddressX[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 #if SLAVE
@@ -33,7 +34,7 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
   }
 }
 
-bool addPeer(uint8_t *peer_addr, uint8_t channel) {
+bool NowClass::addPeer(uint8_t *peer_addr, uint8_t channel) {
   int exists = esp_now_is_peer_exist(peer_addr);
   if (exists) {
     Serial.println(F("Already Paired"));
@@ -73,7 +74,7 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
     }
 #else
     if (pairingData.id > 0) {
-      addPeer(mac, pairingData.channel);
+      Now.addPeer(mac, pairingData.channel);
       pairingData.id = 0; // 0 is server
       pairingData.channel = Wifi.getChannel();
       esp_now_send(mac, (uint8_t *)&pairingData, sizeof(pairingData));
@@ -83,7 +84,16 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
   }
 }
 
-void initESPNOW() {
+void NowClass::cleanup() {
+  esp_now_deinit();
+  WiFi.mode(WIFI_STA);
+  wifi_promiscuous_enable(1);
+  wifi_set_channel(config.channel);
+  wifi_promiscuous_enable(0);
+  WiFi.disconnect();
+}
+
+void NowClass::initESPNOW() {
   if (esp_now_init() != 0) {
     Serial.println(F("Error initializing ESP-NOW"));
   }
@@ -92,7 +102,7 @@ void initESPNOW() {
   esp_now_register_recv_cb(OnDataRecv);
 }
 
-PairingStatus autoPairing() {
+PairingStatus NowClass::autoPairing() {
   switch (pairingStatus) {
   case NOT_PAIRED:
     // Nothing to do here
@@ -100,16 +110,8 @@ PairingStatus autoPairing() {
   case PAIR_REQUEST:
     Serial.print(F("Pairing request on channel "));
     Serial.println(config.channel);
-
-    // Clean esp now
-    esp_now_deinit();
-    WiFi.mode(WIFI_STA);
-    wifi_promiscuous_enable(1);
-    wifi_set_channel(config.channel);
-    wifi_promiscuous_enable(0);
-    WiFi.disconnect();
+    cleanup();
     initESPNOW();
-
     pairingData.msgType = PAIRING;
     pairingData.id = BOARD_ID;
     pairingData.channel = config.channel;

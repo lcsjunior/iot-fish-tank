@@ -57,10 +57,6 @@ WifiClass::WifiClass() {
 #endif
 }
 
-uint32_t WifiClass::getChipId() const { return _chipId; }
-
-uint8_t WifiClass::getChannel() const { return _channel; }
-
 void WifiClass::initAP() {
   char apSsid[32];
   sprintf_P(apSsid, "ESPsoftAP-%06x", _chipId);
@@ -149,3 +145,9 @@ void WifiClass::loop() {
     ArduinoOTA.handle();
   }
 }
+
+uint32_t WifiClass::getChipId() const { return _chipId; }
+
+uint8_t WifiClass::getChannel() const { return _channel; }
+
+void WifiClass::reboot() { _shouldReboot = true; }

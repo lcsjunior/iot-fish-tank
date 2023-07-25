@@ -41,11 +41,12 @@ private:
 
 public:
   WifiClass();
-  uint32_t getChipId() const;
-  uint8_t getChannel() const;
   void initAP();
   void initSTA();
   void loop();
+  uint32_t getChipId() const;
+  uint8_t getChannel() const;
+  void reboot();
 };
 extern WifiClass Wifi;
 

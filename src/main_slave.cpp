@@ -21,11 +21,12 @@ void setup() {
     Serial.println(F("Using default config"));
   }
   saveConfigFile();
-  initESPNOW();
+
+  Now.initESPNOW();
 }
 
 void loop() {
-  if (autoPairing() == PAIR_PAIRED) {
+  if (Now.autoPairing() == PAIR_PAIRED) {
     if ((millis() - lastEventTime) >= EVENT_INTERVAL) {
       lastEventTime = millis();
       outgoingReadings.msgType = DATA;
