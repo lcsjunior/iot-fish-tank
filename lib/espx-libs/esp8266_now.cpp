@@ -73,10 +73,10 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
     }
 #else
     if (pairingData.id > 0) {
+      addPeer(mac, pairingData.channel);
       pairingData.id = 0; // 0 is server
       pairingData.channel = Wifi.getChannel();
       esp_now_send(mac, (uint8_t *)&pairingData, sizeof(pairingData));
-      addPeer(mac, pairingData.channel);
     }
 #endif
     break;
