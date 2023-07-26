@@ -26,6 +26,7 @@ void setup() {
 }
 
 void loop() {
+  Wifi.loop();
   if (Now.autoPairing() == PAIR_PAIRED) {
     if ((millis() - lastEventTime) >= EVENT_INTERVAL) {
       lastEventTime = millis();
