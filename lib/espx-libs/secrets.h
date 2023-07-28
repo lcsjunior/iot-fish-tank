@@ -1,9 +1,0 @@
-#ifndef SECRETS_H
-#define SECRETS_H
-
-#include <Arduino.h>
-
-uint8_t broadcastAddress1[6] = {0x18, 0xFE, 0x34, 0xE2, 0x79, 0x49};
-uint8_t broadcastAddress2[6] = {0x18, 0xFE, 0x34, 0xEF, 0x37, 0x63};
-
-#endif // SECRETS_H
