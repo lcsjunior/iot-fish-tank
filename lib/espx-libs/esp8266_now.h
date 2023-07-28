@@ -6,6 +6,7 @@
 #include <espx_wifi.h>
 #include <espnow.h>
 
+#define MAX_NUM_PEER 10
 #define MAX_CHANNEL 13
 #define PAIR_CONNECT_TIMEOUT (MILLIS_PER_SECOND * 5)
 

@@ -28,7 +28,7 @@ void handleSerialCommand() {
   switch (incomingCmd) {
   case CommandAction::REBOOT:
     outgoingReadings.cmd = CommandAction::REBOOT;
-    esp_now_send(broadcastAddress1, (uint8_t *)&outgoingReadings,
+    esp_now_send(peerAddress[1], (uint8_t *)&outgoingReadings,
                  sizeof(outgoingReadings));
     break;
   default:
