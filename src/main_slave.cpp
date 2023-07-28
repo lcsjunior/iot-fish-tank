@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <config.h>
+#include <common.h>
 #include <espx_wifi.h>
 #include <esp8266_now.h>
 
@@ -7,12 +8,8 @@
 
 unsigned long lastEventTime = 0;
 
-typedef struct struct_message {
-  MessageType msgType;
-  char msg[50];
-} struct_message;
 struct_message outgoingReadings;
-// struct_message incomingReadings;
+struct_message incomingReadings;
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
@@ -27,14 +24,33 @@ void setup() {
 
 void loop() {
   Wifi.loop();
+
   if (Now.autoPairing() == PAIR_PAIRED) {
     if ((millis() - lastEventTime) >= EVENT_INTERVAL) {
       lastEventTime = millis();
-      outgoingReadings.msgType = DATA;
       strcpy(outgoingReadings.msg, ENV_NAME);
       esp_now_send(broadcastAddressX, (uint8_t *)&outgoingReadings,
                    sizeof(outgoingReadings));
     }
   }
+
   delay(100);
+}
+
+bool handleCommand() {
+  bool ret;
+  switch (incomingReadings.cmd) {
+  case CommandAction::REBOOT:
+    Wifi.reboot();
+    ret = true;
+    break;
+  }
+  return ret;
+}
+
+void callbackData(uint8_t *incomingData, uint8_t len) {
+  memcpy_P(&incomingReadings, incomingData, sizeof(incomingReadings));
+  if (!handleCommand()) {
+    Serial.println(F("It's data"));
+  }
 }

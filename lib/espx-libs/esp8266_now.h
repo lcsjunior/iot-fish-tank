@@ -9,12 +9,9 @@
 #define MAX_CHANNEL 13
 #define PAIR_CONNECT_TIMEOUT (MILLIS_PER_SECOND * 5)
 
-extern uint8_t broadcastAddressX[6];
+void callbackData(uint8_t *incomingData, uint8_t len);
 
-enum MessageType {
-  PAIRING = 1,
-  DATA,
-};
+extern uint8_t broadcastAddressX[6];
 
 enum PairingStatus {
   NOT_PAIRED,
@@ -23,10 +20,11 @@ enum PairingStatus {
   PAIR_PAIRED,
 };
 
+enum MessageType { PAIRING = 1, DATA };
+
 class NowClass {
 public:
   bool addPeer(uint8_t *peer_addr, uint8_t channel);
-  void cleanup();
   void initESPNOW();
   PairingStatus autoPairing();
 };

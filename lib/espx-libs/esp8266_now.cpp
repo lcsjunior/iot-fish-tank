@@ -10,7 +10,7 @@ PairingStatus pairingStatus = NOT_PAIRED;
 #endif
 
 typedef struct struct_pairing {
-  MessageType msgType;
+  MessageType msgType = PAIRING;
   uint8_t id;
   uint8_t macAddr[6];
   uint8_t channel;
@@ -25,13 +25,13 @@ void printPairingData() {
                   pairingData.msgType, pairingData.id, pairingData.channel);
 }
 
-void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
-  Serial.print(F("Last Packet Send Status: "));
-  if (sendStatus == 0) {
-    Serial.println(F("Delivery success"));
-  } else {
-    Serial.println(F("Delivery fail"));
-  }
+void cleanup() {
+  esp_now_deinit();
+  WiFi.mode(WIFI_STA);
+  wifi_promiscuous_enable(1);
+  wifi_set_channel(config.channel);
+  wifi_promiscuous_enable(0);
+  WiFi.disconnect();
 }
 
 bool NowClass::addPeer(uint8_t *peer_addr, uint8_t channel) {
@@ -52,6 +52,15 @@ bool NowClass::addPeer(uint8_t *peer_addr, uint8_t channel) {
   }
 }
 
+void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
+  Serial.print(F("Last Packet Send Status: "));
+  if (sendStatus == 0) {
+    Serial.println(F("Delivery success"));
+  } else {
+    Serial.println(F("Delivery fail"));
+  }
+}
+
 void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
   Serial.print(len);
   Serial.print(F(" bytes received from: "));
@@ -59,8 +68,6 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
   Serial.println();
   uint8_t msgType = incomingData[0];
   switch (msgType) {
-  case DATA:
-    break;
   case PAIRING:
     memcpy_P(&pairingData, incomingData, sizeof(pairingData));
     printPairingData();
@@ -81,16 +88,10 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
     }
 #endif
     break;
+  case DATA:
+    callbackData(incomingData, len);
+    break;
   }
-}
-
-void NowClass::cleanup() {
-  esp_now_deinit();
-  WiFi.mode(WIFI_STA);
-  wifi_promiscuous_enable(1);
-  wifi_set_channel(config.channel);
-  wifi_promiscuous_enable(0);
-  WiFi.disconnect();
 }
 
 void NowClass::initESPNOW() {
@@ -112,7 +113,6 @@ PairingStatus NowClass::autoPairing() {
     Serial.println(config.channel);
     cleanup();
     initESPNOW();
-    pairingData.msgType = PAIRING;
     pairingData.id = BOARD_ID;
     pairingData.channel = config.channel;
     esp_now_send(broadcastAddressX, (uint8_t *)&pairingData,
