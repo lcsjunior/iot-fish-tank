@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include <config.h>
 #include <common.h>
-#include <espx_wifi.h>
-#include <esp8266_now.h>
 
 #define EVENT_INTERVAL (MILLIS_PER_SECOND * 10)
 

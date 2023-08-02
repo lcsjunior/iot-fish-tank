@@ -39,12 +39,21 @@ void printMAC(const uint8_t *mac_addr) {
   Serial.print(macStr);
 }
 
-uint8_t dBmToQuality(const int16_t dBm) {
+uint8_t dBm2Quality(const int16_t dBm) {
   if (dBm <= -100)
     return 0;
   else if (dBm >= -50)
     return 100;
   return 2 * (dBm + 100);
+}
+
+int str2mac(const char *mac, uint8_t *values) {
+  if (6 == sscanf(mac, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &values[0], &values[1],
+                  &values[2], &values[3], &values[4], &values[5])) {
+    return 1;
+  } else {
+    return 0;
+  }
 }
 
 WifiClass::WifiClass() {
@@ -66,8 +75,7 @@ void WifiClass::initAP() {
                                                        : F("Failed!"));
 
   Serial.print(F("Setting soft-AP... "));
-  Serial.println(WiFi.softAP(apSsid, _apPass, _channel) ? F("Ready")
-                                                        : F("Failed!"));
+  Serial.println(WiFi.softAP(apSsid, _apPass) ? F("Ready") : F("Failed!"));
 
   Serial.print(F("AP IP Address:      "));
   Serial.println(WiFi.softAPIP());
@@ -83,7 +91,7 @@ void WifiClass::initAP() {
 
   Serial.print(F("Channel:            "));
   Serial.println(WiFi.channel());
-  _channel = WiFi.channel();
+  _apChannel = WiFi.channel();
 }
 
 void WifiClass::initSTA() {
@@ -124,7 +132,7 @@ void WifiClass::initSTA() {
   uint8_t dBm = WiFi.RSSI();
   Serial.print(dBm);
   Serial.print(F(" dBm / "));
-  Serial.print(dBmToQuality(dBm));
+  Serial.print(dBm2Quality(dBm));
   Serial.println(F("%"));
 }
 
@@ -147,6 +155,8 @@ void WifiClass::loop() {
 }
 
 uint32_t WifiClass::getChipId() const { return _chipId; }
+
+uint8_t WifiClass::getAPChannel() const { return _apChannel; }
 
 uint8_t WifiClass::getChannel() const { return _channel; }
 

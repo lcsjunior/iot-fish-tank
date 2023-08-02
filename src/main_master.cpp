@@ -2,8 +2,6 @@
 #include <config.h>
 #include <common.h>
 #include <secrets.h>
-#include <espx_wifi.h>
-#include <esp8266_now.h>
 
 int incomingCmd;
 

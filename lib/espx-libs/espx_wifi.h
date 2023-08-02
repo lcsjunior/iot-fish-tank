@@ -6,6 +6,7 @@
 #include <ESP8266WiFi.h>
 #else
 #include <WiFi.h>
+#include <esp_wifi.h>
 #endif
 #include <ArduinoOTA.h>
 #include <LittleFS.h>
@@ -22,7 +23,8 @@ time_t now();
 time_t uptime();
 void printLocalDateTime();
 void printMAC(const uint8_t *mac_addr);
-uint8_t dBmToQuality(const int16_t dBm);
+uint8_t dBm2Quality(const int16_t dBm);
+int str2mac(const char *mac, uint8_t *values);
 
 class WifiClass {
 private:
@@ -37,6 +39,7 @@ private:
   bool _shouldReboot = false;
   bool _isSTAEnabled = false;
   uint32_t _chipId = 0;
+  uint8_t _apChannel = 0;
   uint8_t _channel = 0;
 
 public:
@@ -45,6 +48,7 @@ public:
   void initSTA();
   void loop();
   uint32_t getChipId() const;
+  uint8_t getAPChannel() const;
   uint8_t getChannel() const;
   void reboot();
 };

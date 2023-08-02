@@ -2,7 +2,12 @@
 #define COMMON_H
 
 #include <Arduino.h>
+#include <espx_wifi.h>
+#if defined(ESP8266)
 #include <esp8266_now.h>
+#else
+#include <esp32_now.h>
+#endif
 
 enum CommandAction { REBOOT = 1 };
 

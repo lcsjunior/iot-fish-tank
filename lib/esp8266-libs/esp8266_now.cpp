@@ -21,8 +21,11 @@ unsigned long previousMillis = 0;
 
 void printPairingData() {
   printLocalDateTime();
-  Serial.printf_P("\nPairing: msgType: %d, id: %d, channel: %d\n",
+  Serial.printf_P("\nPairing Data: msgType: %d, id: %d, channel: %d\n",
                   pairingData.msgType, pairingData.id, pairingData.channel);
+  Serial.print("Pairing MAC: ");
+  printMAC(pairingData.macAddr);
+  Serial.println();
 }
 
 void cleanup() {
@@ -37,7 +40,7 @@ void cleanup() {
 bool NowClass::addPeer(uint8_t *peer_addr, uint8_t channel) {
   int exists = esp_now_is_peer_exist(peer_addr);
   if (exists) {
-    Serial.println(F("Already Paired"));
+    Serial.println(F("Already paired"));
     return true;
   } else {
     int addStatus =
@@ -73,18 +76,22 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
     printPairingData();
 #if SLAVE
     if (pairingData.id == 0) {
-      esp_now_add_peer(mac, ESP_NOW_ROLE_COMBO, pairingData.channel, NULL, 0);
-      memcpy(broadcastAddressX, mac,
+      Now.addPeer(pairingData.macAddr, pairingData.channel);
+
+      memcpy(broadcastAddressX, pairingData.macAddr,
              sizeof(broadcastAddressX)); // Adjust broadcastAddressX
       pairingStatus = PAIR_PAIRED;
       saveConfigFile();
     }
 #else
     if (pairingData.id > 0) {
-      Now.addPeer(mac, pairingData.channel);
+      Now.addPeer(pairingData.macAddr, pairingData.channel);
+
       pairingData.id = 0; // 0 is server
       pairingData.channel = Wifi.getChannel();
-      esp_now_send(mac, (uint8_t *)&pairingData, sizeof(pairingData));
+      str2mac(WiFi.macAddress().c_str(), pairingData.macAddr);
+
+      esp_now_send(mac_addr, (uint8_t *)&pairingData, sizeof(pairingData));
     }
 #endif
     break;
@@ -113,10 +120,14 @@ PairingStatus NowClass::autoPairing() {
     Serial.println(config.channel);
     cleanup();
     initESPNOW();
+
     pairingData.id = BOARD_ID;
     pairingData.channel = config.channel;
+    str2mac(WiFi.macAddress().c_str(), pairingData.macAddr);
+
     esp_now_send(broadcastAddressX, (uint8_t *)&pairingData,
                  sizeof(pairingData));
+
     previousMillis = millis();
     pairingStatus = PAIR_REQUESTED;
     break;
