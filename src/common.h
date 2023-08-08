@@ -14,8 +14,8 @@ enum CommandAction { REBOOT = 1 };
 
 typedef struct struct_message {
   MessageType msgType = DATA;
+  uint8_t id = BOARD_ID;
   CommandAction cmd;
-  char msg[50];
 } struct_message;
 
 #endif // COMMON_H

@@ -25,7 +25,6 @@ void loop() {
   if (Now.autoPairing() == PAIR_PAIRED) {
     if ((millis() - lastEventTime) >= EVENT_INTERVAL) {
       lastEventTime = millis();
-      strcpy(outgoingReadings.msg, ENV_NAME);
       esp_now_send(broadcastAddress, (uint8_t *)&outgoingReadings,
                    sizeof(outgoingReadings));
     }
@@ -36,7 +35,6 @@ void loop() {
 
 void callbackData(uint8_t *incomingData, uint8_t len) {
   memcpy_P(&incomingReadings, incomingData, sizeof(incomingReadings));
-
   switch (incomingReadings.cmd) {
   case CommandAction::REBOOT:
     Wifi.reboot();
