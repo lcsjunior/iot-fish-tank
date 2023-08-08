@@ -13,7 +13,7 @@
 
 void callbackData(uint8_t *incomingData, uint8_t len);
 
-extern uint8_t broadcastAddressX[6];
+extern uint8_t broadcastAddress[6];
 
 enum PairingStatus {
   NOT_PAIRED,
@@ -23,6 +23,13 @@ enum PairingStatus {
 };
 
 enum MessageType { PAIRING = 1, DATA };
+
+typedef struct struct_pairing {
+  MessageType msgType = PAIRING;
+  uint8_t id;
+  uint8_t macAddr[6];
+  uint8_t channel;
+} struct_pairing;
 
 class NowClass {
 public:

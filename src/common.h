@@ -2,6 +2,7 @@
 #define COMMON_H
 
 #include <Arduino.h>
+#include <config.h>
 #include <espx_wifi.h>
 #if defined(ESP8266)
 #include <esp8266_now.h>

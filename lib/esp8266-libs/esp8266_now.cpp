@@ -1,7 +1,7 @@
 #include "esp8266_now.h"
 
 NowClass Now;
-uint8_t broadcastAddressX[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t broadcastAddress[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
 #if SLAVE
 PairingStatus pairingStatus = PAIR_REQUEST;
@@ -9,12 +9,6 @@ PairingStatus pairingStatus = PAIR_REQUEST;
 PairingStatus pairingStatus = NOT_PAIRED;
 #endif
 
-typedef struct struct_pairing {
-  MessageType msgType = PAIRING;
-  uint8_t id;
-  uint8_t macAddr[6];
-  uint8_t channel;
-} struct_pairing;
 struct_pairing pairingData;
 
 unsigned long previousMillis = 0;
@@ -23,7 +17,7 @@ void printPairingData() {
   printLocalDateTime();
   Serial.printf_P("\nPairing Data: msgType: %d, id: %d, channel: %d\n",
                   pairingData.msgType, pairingData.id, pairingData.channel);
-  Serial.print("Pairing MAC: ");
+  Serial.print(F("Pairing MAC: "));
   printMAC(pairingData.macAddr);
   Serial.println();
 }
@@ -65,10 +59,12 @@ void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
 }
 
 void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
+#if DEBUG
   Serial.print(len);
   Serial.print(F(" bytes received from: "));
   printMAC(mac);
   Serial.println();
+#endif
   uint8_t msgType = incomingData[0];
   switch (msgType) {
   case PAIRING:
@@ -78,8 +74,8 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
     if (pairingData.id == 0) {
       Now.addPeer(pairingData.macAddr, pairingData.channel);
 
-      memcpy(broadcastAddressX, pairingData.macAddr,
-             sizeof(broadcastAddressX)); // Adjust broadcastAddressX
+      memcpy(broadcastAddress, pairingData.macAddr,
+             sizeof(broadcastAddress)); // Adjust broadcastAddress
       pairingStatus = PAIR_PAIRED;
       saveConfigFile();
     }
@@ -106,7 +102,9 @@ void NowClass::initESPNOW() {
     Serial.println(F("Error initializing ESP-NOW"));
   }
   esp_now_set_self_role(ESP_NOW_ROLE_COMBO);
+#if DEBUG
   esp_now_register_send_cb(OnDataSent);
+#endif
   esp_now_register_recv_cb(OnDataRecv);
 }
 
@@ -125,7 +123,7 @@ PairingStatus NowClass::autoPairing() {
     pairingData.channel = config.channel;
     str2mac(WiFi.macAddress().c_str(), pairingData.macAddr);
 
-    esp_now_send(broadcastAddressX, (uint8_t *)&pairingData,
+    esp_now_send(broadcastAddress, (uint8_t *)&pairingData,
                  sizeof(pairingData));
 
     previousMillis = millis();

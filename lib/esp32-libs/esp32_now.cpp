@@ -1,7 +1,7 @@
 #include "esp32_now.h"
 
 NowClass Now;
-uint8_t broadcastAddressX[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t broadcastAddress[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 esp_now_peer_info_t peer;
 uint8_t incomingData_[MAX_MESSAGE_SIZE];
 
@@ -11,12 +11,6 @@ PairingStatus pairingStatus = PAIR_REQUEST;
 PairingStatus pairingStatus = NOT_PAIRED;
 #endif
 
-typedef struct struct_pairing {
-  MessageType msgType = PAIRING;
-  uint8_t id;
-  uint8_t macAddr[6];
-  uint8_t channel;
-} struct_pairing;
 struct_pairing pairingData;
 
 unsigned long previousMillis = 0;
@@ -25,13 +19,13 @@ void printPairingData() {
   printLocalDateTime();
   Serial.printf_P("\nPairing Data: msgType: %d, id: %d, channel: %d\n",
                   pairingData.msgType, pairingData.id, pairingData.channel);
-  Serial.print("Pairing MAC: ");
+  Serial.print(F("Pairing MAC: "));
   printMAC(pairingData.macAddr);
   Serial.println();
 }
 
 void cleanup() {
-  esp_now_del_peer(broadcastAddressX);
+  esp_now_del_peer(broadcastAddress);
   ESP_ERROR_CHECK(esp_wifi_set_channel(config.channel, WIFI_SECOND_CHAN_NONE));
 }
 
@@ -44,7 +38,7 @@ bool NowClass::addPeer(const uint8_t *peer_addr, uint8_t channel) {
     memset(&peer, 0, sizeof(esp_now_peer_info_t));
     peer.channel = channel;
     peer.encrypt = false;
-    memcpy_P(peer.peer_addr, peer_addr, sizeof(broadcastAddressX));
+    memcpy_P(peer.peer_addr, peer_addr, sizeof(broadcastAddress));
     int addStatus = esp_now_add_peer(&peer);
     if (addStatus == ESP_OK) {
       Serial.println(F("Pair success"));
@@ -66,10 +60,12 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
 
 void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len) {
+#if DEBUG
   Serial.print(len);
   Serial.print(F(" bytes received from: "));
   printMAC(mac_addr);
   Serial.println();
+#endif
   uint8_t msgType = incomingData[0];
   switch (msgType) {
   case PAIRING:
@@ -79,8 +75,8 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len) {
     if (pairingData.id == 0) {
       Now.addPeer(pairingData.macAddr, pairingData.channel);
 
-      memcpy(broadcastAddressX, pairingData.macAddr,
-             sizeof(broadcastAddressX)); // Adjust broadcastAddressX
+      memcpy(broadcastAddress, pairingData.macAddr,
+             sizeof(broadcastAddress)); // Adjust broadcastAddress
       pairingStatus = PAIR_PAIRED;
       saveConfigFile();
     }
@@ -107,7 +103,9 @@ void NowClass::initESPNOW() {
   if (esp_now_init() != 0) {
     Serial.println(F("Error initializing ESP-NOW"));
   }
+#if DEBUG
   esp_now_register_send_cb(OnDataSent);
+#endif
   esp_now_register_recv_cb(OnDataRecv);
 }
 
@@ -126,7 +124,7 @@ PairingStatus NowClass::autoPairing() {
     pairingData.channel = config.channel;
     str2mac(WiFi.macAddress().c_str(), pairingData.macAddr);
 
-    esp_now_send(broadcastAddressX, (uint8_t *)&pairingData,
+    esp_now_send(broadcastAddress, (uint8_t *)&pairingData,
                  sizeof(pairingData));
 
     previousMillis = millis();

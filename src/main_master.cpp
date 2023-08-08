@@ -1,9 +1,7 @@
 #include <Arduino.h>
-#include <config.h>
 #include <common.h>
-#include <secrets.h>
 
-int incomingCmd;
+uint8_t peersAddress[MAX_NUM_PEER][6] = {PEERS_ADDRS};
 
 struct_message outgoingReadings;
 struct_message incomingReadings;
@@ -22,26 +20,8 @@ void setup() {
   Now.initESPNOW();
 }
 
-void handleSerialCommand() {
-  switch (incomingCmd) {
-  case CommandAction::REBOOT:
-    outgoingReadings.cmd = CommandAction::REBOOT;
-    esp_now_send(peerAddress[1], (uint8_t *)&outgoingReadings,
-                 sizeof(outgoingReadings));
-    break;
-  default:
-    break;
-  }
-}
-
 void loop() {
   Wifi.loop();
-
-  if (Serial.available() > 0) {
-    incomingCmd = Serial.parseInt();
-    handleSerialCommand();
-  }
-
   delay(100);
 }
 
