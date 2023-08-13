@@ -14,7 +14,7 @@ enum Command { NONE = 1, REBOOT, BLINK, SET_PREFS, TOGGLE_LED };
 
 typedef struct struct_message {
   MessageType msgType = DATA;
-  uint8_t id = BOARD_ID;
+  uint32_t id = Wifi.getChipId();
   Command cmd = NONE;
   uint8_t channel;
   float setpoint;

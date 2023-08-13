@@ -56,16 +56,6 @@ int str2mac(const char *mac, uint8_t *values) {
   }
 }
 
-WifiClass::WifiClass() {
-#if defined(ESP8266)
-  _chipId = ESP.getChipId();
-#else
-  for (int i = 0; i < 17; i = i + 8) {
-    _chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
-  }
-#endif
-}
-
 void WifiClass::initAP() {
   char apSsid[32];
   sprintf_P(apSsid, "ESPsoftAP-%06x", _chipId);
@@ -154,7 +144,19 @@ void WifiClass::loop() {
   }
 }
 
-uint32_t WifiClass::getChipId() const { return _chipId; }
+uint32_t WifiClass::getChipId() {
+  if (_chipId > 0) {
+    return _chipId;
+  }
+#if defined(ESP8266)
+  _chipId = ESP.getChipId();
+#else
+  for (int i = 0; i < 17; i = i + 8) {
+    _chipId |= ((ESP.getEfuseMac() >> (40 - i)) & 0xff) << i;
+  }
+#endif
+  return _chipId;
+}
 
 uint8_t WifiClass::getAPChannel() const { return _apChannel; }
 

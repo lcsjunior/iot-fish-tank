@@ -3,7 +3,7 @@
 #include <ESP8266WebServer.h>
 #include <uri/UriBraces.h>
 
-#define NUM_PEER 2
+#define NUM_PEER 3
 
 uint8_t peersAddress[NUM_PEER][6] = {PEERS_ADDRS};
 
@@ -54,7 +54,7 @@ void loop() {
 void callbackData(uint8_t *incomingData, uint8_t len) {
   memcpy_P(&incomingReadings, incomingData, sizeof(incomingReadings));
   Serial.printf_P(
-      "Data:  id: %d, channel: %d, setpoint: %.1f, hysteresis: %.1f, "
+      "Data - id: %d, channel: %d, setpoint: %.1f, hysteresis: %.1f, "
       "cTemp: %.1f, isHeaterOn: %d, isLedOn: %d\n",
       incomingReadings.id, incomingReadings.channel, incomingReadings.setpoint,
       incomingReadings.hysteresis, incomingReadings.cTemp,

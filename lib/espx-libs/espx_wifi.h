@@ -47,11 +47,10 @@ private:
   uint8_t _channel = 0;
 
 public:
-  WifiClass();
   void initAP();
   void initSTA();
   void loop();
-  uint32_t getChipId() const;
+  uint32_t getChipId();
   uint8_t getAPChannel() const;
   uint8_t getChannel() const;
   void reboot();

@@ -26,7 +26,7 @@ enum MessageType { PAIRING = 1, DATA };
 
 typedef struct struct_pairing {
   MessageType msgType = PAIRING;
-  uint8_t id;
+  uint8_t id = Wifi.getChipId();
   uint8_t macAddr[6];
   uint8_t channel;
 } struct_pairing;

@@ -15,7 +15,7 @@ unsigned long previousMillis = 0;
 
 void printPairingData() {
   printLocalDateTime();
-  Serial.printf_P("\nPairing Data:  msgType: %d, id: %d, channel: %d\n",
+  Serial.printf_P("\nPairing Data - msgType: %d, id: %d, channel: %d\n",
                   pairingData.msgType, pairingData.id, pairingData.channel);
   Serial.print(F("Pairing MAC: "));
   printMAC(pairingData.macAddr);
@@ -83,7 +83,7 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
     if (pairingData.id > 0) {
       Now.addPeer(pairingData.macAddr, pairingData.channel);
 
-      pairingData.id = 0; // 0 is server
+      pairingData.id = 0; // 0 is master
       pairingData.channel = Wifi.getChannel();
       str2mac(WiFi.macAddress().c_str(), pairingData.macAddr);
 
@@ -119,7 +119,7 @@ PairingStatus NowClass::autoPairing() {
     cleanup();
     initESPNOW();
 
-    pairingData.id = BOARD_ID;
+    pairingData.id = Wifi.getChipId();
     pairingData.channel = config.channel;
     str2mac(WiFi.macAddress().c_str(), pairingData.macAddr);
 
