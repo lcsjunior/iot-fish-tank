@@ -20,4 +20,4 @@ public:
   float getCTemp();
 };
 
-#endif
+#endif // TEMP_SENSOR_H

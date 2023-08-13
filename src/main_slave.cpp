@@ -13,6 +13,7 @@ struct_message incomingReadings;
 Relay led;
 Relay heater;
 DSTempSensor tempSensor;
+Thermostat thermostat(&tempSensor, &heater);
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
@@ -35,10 +36,13 @@ void setup() {
   printConfigFile();
 
   Now.initESPNOW();
+
+  thermostat.setup(config.setpoint, config.hysteresis, 0, 30);
 }
 
 void loop() {
   Wifi.loop();
+  thermostat.handleHeater();
 
   if (incomingReadings.cmd == BLINK) {
     digitalWrite(LED_BUILTIN, LOW);
@@ -58,6 +62,7 @@ void loop() {
       outgoingReadings.channel = config.channel;
       outgoingReadings.setpoint = config.setpoint;
       outgoingReadings.hysteresis = config.hysteresis;
+      outgoingReadings.thermostat = thermostat.getState();
       outgoingReadings.cTemp = tempSensor.getCTemp();
       outgoingReadings.isHeaterOn = heater.isOn();
       outgoingReadings.isLedOn = led.isOn();

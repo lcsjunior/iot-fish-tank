@@ -9,6 +9,7 @@
 #else
 #include <esp32_now.h>
 #endif
+#include <thermostat.h>
 
 enum Command { NONE = 1, REBOOT, BLINK, SET_PREFS, TOGGLE_LED };
 
@@ -19,7 +20,7 @@ typedef struct struct_message {
   uint8_t channel;
   float setpoint;
   float hysteresis;
-  uint8_t thermostat;
+  ThermostatState thermostat;
   float cTemp;
   uint8_t isHeaterOn;
   uint8_t isLedOn;

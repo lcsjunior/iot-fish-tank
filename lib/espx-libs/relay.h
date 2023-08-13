@@ -18,4 +18,4 @@ public:
   void toggle();
 };
 
-#endif
+#endif // RELAY_H
