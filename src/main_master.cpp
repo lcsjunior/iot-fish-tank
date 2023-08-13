@@ -1,11 +1,8 @@
 #include <Arduino.h>
 #include <common.h>
+#include <secrets.h>
 #include <ESP8266WebServer.h>
 #include <uri/UriBraces.h>
-
-#define NUM_PEER 3
-
-uint8_t peersAddress[NUM_PEER][6] = {PEERS_ADDRS};
 
 struct_message outgoingReadings;
 struct_message incomingReadings;
@@ -32,9 +29,8 @@ void setup() {
   Wifi.initSTA();
 
   Now.initESPNOW();
-  for (uint8_t *peer : peersAddress) {
-    Now.addPeer(peer, Wifi.getChannel());
-  };
+  Now.addPeer(SLAVE49, Wifi.getChannel());
+  Now.addPeer(SLAVE63, Wifi.getChannel());
 
   server.on(F("/"), handleRoot);
   server.on(UriBraces(F("/slaves/{}/reboot")), handleSlaveReboot);
@@ -65,18 +61,21 @@ void handleRoot() {
   server.send(200, FPSTR(TEXT_PLAIN), FPSTR("hello from ESP!"));
 }
 
-uint8_t getSlaveId() { return server.pathArg(0).toInt(); }
+uint8_t *getSlaveFromServer() {
+  const int slaveId = server.pathArg(0).toInt();
+  return getSlaveById(slaveId);
+};
 
 void handleSlaveReboot() {
   outgoingReadings.cmd = REBOOT;
-  esp_now_send(peersAddress[getSlaveId()], (uint8_t *)&outgoingReadings,
+  esp_now_send(getSlaveFromServer(), (uint8_t *)&outgoingReadings,
                sizeof(outgoingReadings));
   server.send(200);
 }
 
 void handleSlaveBlink() {
   outgoingReadings.cmd = BLINK;
-  esp_now_send(peersAddress[getSlaveId()], (uint8_t *)&outgoingReadings,
+  esp_now_send(getSlaveFromServer(), (uint8_t *)&outgoingReadings,
                sizeof(outgoingReadings));
   server.send(200);
 }
@@ -94,7 +93,7 @@ void handleSlavePrefs() {
     outgoingReadings.channel = server.arg(F("channel")).toInt();
     outgoingReadings.setpoint = server.arg(F("setpoint")).toFloat();
     outgoingReadings.hysteresis = server.arg(F("hysteresis")).toFloat();
-    esp_now_send(peersAddress[getSlaveId()], (uint8_t *)&outgoingReadings,
+    esp_now_send(getSlaveFromServer(), (uint8_t *)&outgoingReadings,
                  sizeof(outgoingReadings));
   }
   server.send(200);
@@ -102,7 +101,7 @@ void handleSlavePrefs() {
 
 void handleSlaveLedToggle() {
   outgoingReadings.cmd = TOGGLE_LED;
-  esp_now_send(peersAddress[getSlaveId()], (uint8_t *)&outgoingReadings,
+  esp_now_send(getSlaveFromServer(), (uint8_t *)&outgoingReadings,
                sizeof(outgoingReadings));
   server.send(200);
 }
