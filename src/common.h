@@ -19,6 +19,7 @@ typedef struct struct_message {
   uint8_t channel;
   float setpoint;
   float hysteresis;
+  uint8_t thermostat;
   float cTemp;
   uint8_t isHeaterOn;
   uint8_t isLedOn;

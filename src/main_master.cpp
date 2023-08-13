@@ -49,12 +49,13 @@ void loop() {
 
 void callbackData(uint8_t *incomingData, uint8_t len) {
   memcpy_P(&incomingReadings, incomingData, sizeof(incomingReadings));
-  Serial.printf_P(
-      "Data - id: %d, channel: %d, setpoint: %.1f, hysteresis: %.1f, "
-      "cTemp: %.1f, isHeaterOn: %d, isLedOn: %d\n",
-      incomingReadings.id, incomingReadings.channel, incomingReadings.setpoint,
-      incomingReadings.hysteresis, incomingReadings.cTemp,
-      incomingReadings.isHeaterOn, incomingReadings.isLedOn);
+  Serial.printf_P("Data - id: %d, channel: %d, setpoint: %.1f, hysteresis: "
+                  "%.1f, thermostat: %d, "
+                  "cTemp: %.1f, isHeaterOn: %d, isLedOn: %d\n",
+                  incomingReadings.id, incomingReadings.channel,
+                  incomingReadings.setpoint, incomingReadings.hysteresis,
+                  incomingReadings.thermostat, incomingReadings.cTemp,
+                  incomingReadings.isHeaterOn, incomingReadings.isLedOn);
 }
 
 void handleRoot() {
