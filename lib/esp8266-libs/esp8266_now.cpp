@@ -15,7 +15,7 @@ unsigned long previousMillis = 0;
 
 void printPairingData() {
   printLocalDateTime();
-  Serial.printf_P("\nPairing Data: msgType: %d, id: %d, channel: %d\n",
+  Serial.printf_P("\nPairing Data:  msgType: %d, id: %d, channel: %d\n",
                   pairingData.msgType, pairingData.id, pairingData.channel);
   Serial.print(F("Pairing MAC: "));
   printMAC(pairingData.macAddr);
@@ -87,7 +87,7 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
       pairingData.channel = Wifi.getChannel();
       str2mac(WiFi.macAddress().c_str(), pairingData.macAddr);
 
-      esp_now_send(mac_addr, (uint8_t *)&pairingData, sizeof(pairingData));
+      esp_now_send(mac, (uint8_t *)&pairingData, sizeof(pairingData));
     }
 #endif
     break;

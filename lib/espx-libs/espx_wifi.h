@@ -18,6 +18,10 @@
 #define NTP_SERVER "pool.ntp.org"
 #define TZ "<-03>3"
 
+static const char TEXT_PLAIN[] PROGMEM = "text/plain";
+static const char TEXT_HTML[] PROGMEM = "text/html";
+static const char APPLICATION_JSON[] PROGMEM = "application/json";
+
 bool mountFS();
 time_t now();
 time_t uptime();

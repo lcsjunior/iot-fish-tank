@@ -17,7 +17,7 @@ unsigned long previousMillis = 0;
 
 void printPairingData() {
   printLocalDateTime();
-  Serial.printf_P("\nPairing Data: msgType: %d, id: %d, channel: %d\n",
+  Serial.printf_P("\nPairing Data:  msgType: %d, id: %d, channel: %d\n",
                   pairingData.msgType, pairingData.id, pairingData.channel);
   Serial.print(F("Pairing MAC: "));
   printMAC(pairingData.macAddr);

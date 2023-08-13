@@ -4,6 +4,7 @@
     "*.jsx": "javascriptreact",
     "*.ts": "typescript",
     "*.tsx": "typescriptreact",
-    "ranges": "cpp"
+    "ranges": "cpp",
+    "system_error": "cpp"
   }
 }

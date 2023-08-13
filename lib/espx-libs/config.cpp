@@ -48,8 +48,12 @@ void printConfigFile() {
 
 void convertToJson(const Config &src, JsonVariant dst) {
   dst["channel"] = src.channel;
+  dst["setpoint"] = src.setpoint;
+  dst["hysteresis"] = src.hysteresis;
 }
 
 void convertFromJson(JsonVariantConst src, Config &dst) {
   dst.channel = src["channel"];
+  dst.setpoint = src["setpoint"];
+  dst.hysteresis = src["hysteresis"];
 }

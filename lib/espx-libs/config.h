@@ -8,7 +8,9 @@
 #define JSON_DOC_SIZE 1024
 
 struct Config {
-  uint8_t channel = 0;
+  uint8_t channel;
+  float setpoint;
+  float hysteresis;
 };
 extern Config config;
 

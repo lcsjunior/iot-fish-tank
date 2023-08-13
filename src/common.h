@@ -10,12 +10,18 @@
 #include <esp32_now.h>
 #endif
 
-enum CommandAction { REBOOT = 1 };
+enum Command { NONE = 1, REBOOT, BLINK, SET_PREFS, TOGGLE_LED };
 
 typedef struct struct_message {
   MessageType msgType = DATA;
   uint8_t id = BOARD_ID;
-  CommandAction cmd;
+  Command cmd = NONE;
+  uint8_t channel;
+  float setpoint;
+  float hysteresis;
+  float cTemp;
+  uint8_t isHeaterOn;
+  uint8_t isLedOn;
 } struct_message;
 
 #endif // COMMON_H
