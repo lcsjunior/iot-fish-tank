@@ -17,7 +17,7 @@ unsigned long previousMillis = 0;
 
 void printPairingData() {
   printLocalDateTime();
-  Serial.printf_P("\nPairing Data - msgType: %d, id: %d, channel: %d\n",
+  Serial.printf_P("Pairing Data - msgType: %d, id: %d, channel: %d\n",
                   pairingData.msgType, pairingData.id, pairingData.channel);
   Serial.print(F("Pairing MAC: "));
   printMAC(pairingData.macAddr);
@@ -51,12 +51,14 @@ bool NowClass::addPeer(const uint8_t *peer_addr, uint8_t channel) {
 }
 
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+#if DEBUG
   Serial.print(F("Last Packet Send Status: "));
   if (status == ESP_NOW_SEND_SUCCESS) {
     Serial.println(F("Delivery success"));
   } else {
     Serial.println(F("Delivery fail"));
   }
+#endif
 }
 
 void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len) {

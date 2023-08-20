@@ -22,13 +22,13 @@ time_t now() { return time(nullptr); }
 
 time_t uptime() { return (time_t)(millis() / 1000); }
 
+void printReadableLocalTime(time_t *t) {
+  Serial.print(asctime(localtime(&*t)));
+}
+
 void printLocalDateTime() {
   time_t now = time(nullptr);
-  struct tm *timeinfo;
-  timeinfo = localtime(&now);
-  char buf[64];
-  strftime(buf, sizeof(buf), "%A, %B %d %Y %H:%M:%S", timeinfo);
-  Serial.print(buf);
+  printReadableLocalTime(&now);
 }
 
 void printMAC(const uint8_t *mac_addr) {
@@ -39,14 +39,6 @@ void printMAC(const uint8_t *mac_addr) {
   Serial.print(macStr);
 }
 
-uint8_t dBm2Quality(const int16_t dBm) {
-  if (dBm <= -100)
-    return 0;
-  else if (dBm >= -50)
-    return 100;
-  return 2 * (dBm + 100);
-}
-
 int str2mac(const char *mac, uint8_t *values) {
   if (6 == sscanf(mac, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx", &values[0], &values[1],
                   &values[2], &values[3], &values[4], &values[5])) {
@@ -54,6 +46,14 @@ int str2mac(const char *mac, uint8_t *values) {
   } else {
     return 0;
   }
+}
+
+uint8_t dBm2Quality(const int16_t dBm) {
+  if (dBm <= -100)
+    return 0;
+  else if (dBm >= -50)
+    return 100;
+  return 2 * (dBm + 100);
 }
 
 void WifiClass::initAP() {

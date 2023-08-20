@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
+#include <sys/time.h>
 #else
 #include <WiFi.h>
 #include <esp_wifi.h>
@@ -25,10 +26,11 @@ static const char APPLICATION_JSON[] PROGMEM = "application/json";
 bool mountFS();
 time_t now();
 time_t uptime();
+void printReadableLocalTime(time_t *t);
 void printLocalDateTime();
 void printMAC(const uint8_t *mac_addr);
-uint8_t dBm2Quality(const int16_t dBm);
 int str2mac(const char *mac, uint8_t *values);
+uint8_t dBm2Quality(const int16_t dBm);
 
 class WifiClass {
 private:

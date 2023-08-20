@@ -15,7 +15,7 @@ unsigned long previousMillis = 0;
 
 void printPairingData() {
   printLocalDateTime();
-  Serial.printf_P("\nPairing Data - msgType: %d, id: %d, channel: %d\n",
+  Serial.printf_P("Pairing Data - msgType: %d, id: %d, channel: %d\n",
                   pairingData.msgType, pairingData.id, pairingData.channel);
   Serial.print(F("Pairing MAC: "));
   printMAC(pairingData.macAddr);
@@ -50,12 +50,14 @@ bool NowClass::addPeer(uint8_t *peer_addr, uint8_t channel) {
 }
 
 void OnDataSent(uint8_t *mac_addr, uint8_t sendStatus) {
+#if DEBUG
   Serial.print(F("Last Packet Send Status: "));
   if (sendStatus == 0) {
     Serial.println(F("Delivery success"));
   } else {
     Serial.println(F("Delivery fail"));
   }
+#endif
 }
 
 void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {

@@ -8,8 +8,8 @@
 struct_message outgoingReadings;
 struct_message incomingReadings;
 
-const char *cronstr_at_8am = "0 8 * * *";
-const char *cronstr_at_15pm = "0 15 * * *";
+const char *cronstr_at_8am = "0 0 8 * * *";
+const char *cronstr_at_15pm = "0 0 15 * * *";
 
 ESP8266WebServer server(80);
 
@@ -74,6 +74,10 @@ void loop() {
 
 void callbackData(uint8_t *incomingData, uint8_t len) {
   memcpy_P(&incomingReadings, incomingData, sizeof(incomingReadings));
+#if DEBUG
+  time_t t = Cron.getNextTrigger();
+  Serial.print(F("Next Trigger: "));
+  printReadableLocalTime(&t);
   Serial.printf_P("Data - id: %d, channel: %d, setpoint: %.1f, hysteresis: "
                   "%.1f, thermostat: %d, "
                   "cTemp: %.1f, isHeaterOn: %d, isLedOn: %d \n",
@@ -81,16 +85,17 @@ void callbackData(uint8_t *incomingData, uint8_t len) {
                   incomingReadings.setpoint, incomingReadings.hysteresis,
                   incomingReadings.thermostat, incomingReadings.cTemp,
                   incomingReadings.isHeaterOn, incomingReadings.isLedOn);
-}
-
-void handleRoot() {
-  server.send(200, FPSTR(TEXT_PLAIN), FPSTR("hello from ESP!"));
+#endif
 }
 
 uint8_t *getSlaveFromServer() {
   const int slaveId = server.pathArg(0).toInt();
   return getSlaveById(slaveId);
 };
+
+void handleRoot() {
+  server.send(200, FPSTR(TEXT_PLAIN), FPSTR("hello from ESP!"));
+}
 
 void handleSlaveReboot() {
   outgoingReadings.cmd = REBOOT;
