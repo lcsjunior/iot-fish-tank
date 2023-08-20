@@ -93,5 +93,11 @@ void callbackData(uint8_t *incomingData, uint8_t len) {
   case TOGGLE_LED:
     led.toggle();
     break;
+  case TURN_ON_LED:
+    led.turnOn();
+    break;
+  case TURN_OFF_LED:
+    led.turnOff();
+    break;
   }
 }

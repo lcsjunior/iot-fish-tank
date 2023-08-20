@@ -11,7 +11,15 @@
 #endif
 #include <thermostat.h>
 
-enum Command { NONE = 1, REBOOT, BLINK, SET_PREFS, TOGGLE_LED };
+enum Command {
+  NONE = 1,
+  REBOOT,
+  BLINK,
+  SET_PREFS,
+  TOGGLE_LED,
+  TURN_ON_LED,
+  TURN_OFF_LED
+};
 
 typedef struct struct_message {
   MessageType msgType = DATA;

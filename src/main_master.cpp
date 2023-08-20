@@ -8,7 +8,8 @@
 struct_message outgoingReadings;
 struct_message incomingReadings;
 
-const char *at_8am_and_3pm = "0 0 8,15 ? * * *";
+const char *cronstr_at_8am = "0 8 * * *";
+const char *cronstr_at_15pm = "0 15 * * *";
 
 ESP8266WebServer server(80);
 
@@ -17,6 +18,12 @@ void handleSlaveReboot();
 void handleSlaveBlink();
 void handleSlavePrefs();
 void handleSlaveLedToggle();
+
+void sendBroadcast() {
+  for (uint8_t *peer : peers) {
+    esp_now_send(peer, (uint8_t *)&outgoingReadings, sizeof(outgoingReadings));
+  }
+}
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
@@ -35,13 +42,17 @@ void setup() {
   Now.addPeer(SLAVE49, Wifi.getChannel());
   Now.addPeer(SLAVE63, Wifi.getChannel());
 
-  Cron.create((char *)at_8am_and_3pm,
+  Cron.create((char *)cronstr_at_8am,
               []() {
-                outgoingReadings.cmd = TOGGLE_LED;
-                for (uint8_t *peer : peers) {
-                  esp_now_send(peer, (uint8_t *)&outgoingReadings,
-                               sizeof(outgoingReadings));
-                }
+                outgoingReadings.cmd = TURN_ON_LED;
+                sendBroadcast();
+              },
+              false);
+
+  Cron.create((char *)cronstr_at_15pm,
+              []() {
+                outgoingReadings.cmd = TURN_OFF_LED;
+                sendBroadcast();
               },
               false);
 
