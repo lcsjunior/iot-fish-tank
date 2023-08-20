@@ -1,11 +1,14 @@
 #include <Arduino.h>
 #include <common.h>
 #include <secrets.h>
+#include <CronAlarms.h>
 #include <ESP8266WebServer.h>
 #include <uri/UriBraces.h>
 
 struct_message outgoingReadings;
 struct_message incomingReadings;
+
+const char *at_8am_and_3pm = "0 0 8,15 ? * * *";
 
 ESP8266WebServer server(80);
 
@@ -32,6 +35,16 @@ void setup() {
   Now.addPeer(SLAVE49, Wifi.getChannel());
   Now.addPeer(SLAVE63, Wifi.getChannel());
 
+  Cron.create((char *)at_8am_and_3pm,
+              []() {
+                outgoingReadings.cmd = TOGGLE_LED;
+                for (uint8_t *peer : peers) {
+                  esp_now_send(peer, (uint8_t *)&outgoingReadings,
+                               sizeof(outgoingReadings));
+                }
+              },
+              false);
+
   server.on(F("/"), handleRoot);
   server.on(UriBraces(F("/slaves/{}/reboot")), handleSlaveReboot);
   server.on(UriBraces(F("/slaves/{}/blink")), handleSlaveBlink);
@@ -43,6 +56,7 @@ void setup() {
 
 void loop() {
   Wifi.loop();
+  Cron.delay();
   server.handleClient();
   delay(100);
 }
@@ -51,7 +65,7 @@ void callbackData(uint8_t *incomingData, uint8_t len) {
   memcpy_P(&incomingReadings, incomingData, sizeof(incomingReadings));
   Serial.printf_P("Data - id: %d, channel: %d, setpoint: %.1f, hysteresis: "
                   "%.1f, thermostat: %d, "
-                  "cTemp: %.1f, isHeaterOn: %d, isLedOn: %d\n",
+                  "cTemp: %.1f, isHeaterOn: %d, isLedOn: %d \n",
                   incomingReadings.id, incomingReadings.channel,
                   incomingReadings.setpoint, incomingReadings.hysteresis,
                   incomingReadings.thermostat, incomingReadings.cTemp,
