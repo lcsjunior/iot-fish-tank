@@ -26,7 +26,7 @@ static const char APPLICATION_JSON[] PROGMEM = "application/json";
 bool mountFS();
 time_t now();
 time_t uptime();
-void printReadableLocalTime(time_t *t);
+void printFormattedTime(time_t *t);
 void printLocalDateTime();
 void printMAC(const uint8_t *mac_addr);
 int str2mac(const char *mac, uint8_t *values);

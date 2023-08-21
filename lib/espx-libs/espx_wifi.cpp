@@ -22,13 +22,11 @@ time_t now() { return time(nullptr); }
 
 time_t uptime() { return (time_t)(millis() / 1000); }
 
-void printReadableLocalTime(time_t *t) {
-  Serial.print(asctime(localtime(&*t)));
-}
+void printFormattedTime(time_t *t) { Serial.print(asctime(localtime(&*t))); }
 
 void printLocalDateTime() {
   time_t now = time(nullptr);
-  printReadableLocalTime(&now);
+  printFormattedTime(&now);
 }
 
 void printMAC(const uint8_t *mac_addr) {

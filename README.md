@@ -7,3 +7,4 @@
 - [ ] control led via mqtt
 - [ ] add monitoring in e-paper display
 - [ ] make esp32 master
+- [ ] add new ntp server

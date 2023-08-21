@@ -33,27 +33,29 @@ char *Thermostat::getStatus() const {
 void Thermostat::handleCooler() {}
 
 void Thermostat::handleHeater() {
-  if (isnan(_tempSensor->getCTemp()) || _tempSensor->getCTemp() < _lowerLimit ||
-      _tempSensor->getCTemp() > _upperLimit) {
-    _k->turnOff();
+  float cTemp = _tempSensor->getCTemp();
+
+  if (isnan(cTemp) || cTemp < _lowerLimit || cTemp > _upperLimit) {
+    setState(IDLE);
     return;
   }
 
   switch (_state) {
   case IDLE:
+    _k->turnOff();
     if ((millis() - lastStateExitTime) >= IDLE_TIMEOUT) {
       setState(COOLING);
     }
     break;
   case COOLING:
     _k->turnOff();
-    if (_tempSensor->getCTemp() <= _setpoint) {
+    if (cTemp <= _setpoint) {
       setState(HEATING);
     }
     break;
   case HEATING:
     _k->turnOn();
-    if (_tempSensor->getCTemp() >= _setpoint + _hysteresis) {
+    if (cTemp >= _setpoint + _hysteresis) {
       setState(IDLE);
     }
   }

@@ -39,8 +39,9 @@ void setup() {
   Wifi.initSTA();
 
   Now.initESPNOW();
-  Now.addPeer(SLAVE49, Wifi.getChannel());
-  Now.addPeer(SLAVE63, Wifi.getChannel());
+  for (uint8_t *peer : peers) {
+    Now.addPeer(peer, Wifi.getChannel());
+  }
 
   Cron.create((char *)cronstr_at_8am,
               []() {
@@ -69,6 +70,7 @@ void loop() {
   Wifi.loop();
   Cron.delay();
   server.handleClient();
+
   delay(100);
 }
 
@@ -77,7 +79,7 @@ void callbackData(uint8_t *incomingData, uint8_t len) {
 #if DEBUG
   time_t t = Cron.getNextTrigger();
   Serial.print(F("Next Trigger: "));
-  printReadableLocalTime(&t);
+  printFormattedTime(&t);
   Serial.printf_P("Data - id: %d, channel: %d, setpoint: %.1f, hysteresis: "
                   "%.1f, thermostat: %d, "
                   "cTemp: %.1f, isHeaterOn: %d, isLedOn: %d \n",
