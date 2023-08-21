@@ -13,7 +13,8 @@ struct_message incomingReadings;
 Relay led;
 Relay heater;
 DSTempSensor tempSensor;
-Thermostat thermostat(&tempSensor, &heater);
+Thermostat thermostat(&heater);
+float cTemp;
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
@@ -42,7 +43,25 @@ void setup() {
 
 void loop() {
   Wifi.loop();
-  thermostat.handleHeater();
+
+  cTemp = tempSensor.getCTemp();
+  thermostat.handleHeater(cTemp);
+
+  if (Now.autoPairing() == PAIR_PAIRED) {
+    if ((millis() - lastEventTime) >= EVENT_INTERVAL) {
+      lastEventTime = millis();
+      outgoingReadings.cmd = NONE;
+      outgoingReadings.channel = config.channel;
+      outgoingReadings.setpoint = config.setpoint;
+      outgoingReadings.hysteresis = config.hysteresis;
+      outgoingReadings.thermostat = thermostat.getState();
+      outgoingReadings.cTemp = cTemp;
+      outgoingReadings.isHeaterOn = heater.isOn();
+      outgoingReadings.isLedOn = led.isOn();
+      esp_now_send(broadcastAddress, (uint8_t *)&outgoingReadings,
+                   sizeof(outgoingReadings));
+    }
+  }
 
   if (incomingReadings.cmd == BLINK) {
     digitalWrite(LED_BUILTIN, LOW);
@@ -55,23 +74,7 @@ void loop() {
     incomingReadings.cmd = NONE;
   }
 
-  if (Now.autoPairing() == PAIR_PAIRED) {
-    if ((millis() - lastEventTime) >= EVENT_INTERVAL) {
-      lastEventTime = millis();
-      outgoingReadings.cmd = NONE;
-      outgoingReadings.channel = config.channel;
-      outgoingReadings.setpoint = config.setpoint;
-      outgoingReadings.hysteresis = config.hysteresis;
-      outgoingReadings.thermostat = thermostat.getState();
-      outgoingReadings.cTemp = tempSensor.getCTemp();
-      outgoingReadings.isHeaterOn = heater.isOn();
-      outgoingReadings.isLedOn = led.isOn();
-      esp_now_send(broadcastAddress, (uint8_t *)&outgoingReadings,
-                   sizeof(outgoingReadings));
-    }
-  }
-
-  delay(100);
+  delay(300);
 }
 
 void callbackData(uint8_t *incomingData, uint8_t len) {

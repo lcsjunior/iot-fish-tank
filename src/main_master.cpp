@@ -71,7 +71,7 @@ void loop() {
   Cron.delay();
   server.handleClient();
 
-  delay(100);
+  delay(300);
 }
 
 void callbackData(uint8_t *incomingData, uint8_t len) {

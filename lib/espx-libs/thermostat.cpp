@@ -30,14 +30,11 @@ char *Thermostat::getStatus() const {
   }
 }
 
-void Thermostat::handleCooler() {}
+void Thermostat::handleCooler(float cTemp) {}
 
-void Thermostat::handleHeater() {
-  float cTemp = _tempSensor->getCTemp();
-
+void Thermostat::handleHeater(float cTemp) {
   if (isnan(cTemp) || cTemp < _lowerLimit || cTemp > _upperLimit) {
     setState(IDLE);
-    return;
   }
 
   switch (_state) {
@@ -49,13 +46,13 @@ void Thermostat::handleHeater() {
     break;
   case COOLING:
     _k->turnOff();
-    if (cTemp <= _setpoint) {
+    if (cTemp < _setpoint) {
       setState(HEATING);
     }
     break;
   case HEATING:
     _k->turnOn();
-    if (cTemp >= _setpoint + _hysteresis) {
+    if (cTemp > _setpoint + _hysteresis) {
       setState(IDLE);
     }
   }
