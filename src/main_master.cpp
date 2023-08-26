@@ -76,19 +76,30 @@ void loop() {
 
 void callbackData(uint8_t *incomingData, uint8_t len) {
   memcpy_P(&incomingReadings, incomingData, sizeof(incomingReadings));
-#if DEBUG
-  time_t t = Cron.getNextTrigger();
-  Serial.print(F("Next Trigger: "));
-  printFormattedTime(&t);
-  Serial.printf_P("Data - id: %d, channel: %d, setpoint: %.1f, hysteresis: "
-                  "%.1f, thermostat: %d, "
-                  "cTemp: %.1f, isHeaterOn: %d, isLedOn: %d \n",
-                  incomingReadings.id, incomingReadings.channel,
-                  incomingReadings.setpoint, incomingReadings.hysteresis,
-                  incomingReadings.thermostat, incomingReadings.cTemp,
-                  incomingReadings.isHeaterOn, incomingReadings.isLedOn);
-#endif
+  // Serial.printf_P("Data - id: %d, channel: %d, setpoint: %.1f, hysteresis: "
+  //                 "%.1f, thermostat: %d, "
+  //                 "cTemp: %.1f, isHeaterOn: %d, isLedOn: %d \n",
+  //                 incomingReadings.id, incomingReadings.channel,
+  //                 incomingReadings.setpoint, incomingReadings.hysteresis,
+  //                 incomingReadings.thermostat, incomingReadings.cTemp,
+  //                 incomingReadings.isHeaterOn, incomingReadings.isLedOn);
 }
+
+uint8_t *getSlaveById(const int slaveId) {
+  if (slaveId == SLAVE49_ID)
+    return SLAVE49;
+  if (slaveId == SLAVE63_ID)
+    return SLAVE63;
+  return nullptr;
+};
+
+unsigned long getChannelById(const int slaveId) {
+  if (slaveId == SLAVE49_ID)
+    return SLAVE49_CH_ID;
+  if (slaveId == SLAVE63_ID)
+    return SLAVE63_CH_ID;
+  return -1;
+};
 
 uint8_t *getSlaveFromServer() {
   const int slaveId = server.pathArg(0).toInt();

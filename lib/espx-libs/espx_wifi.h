@@ -16,6 +16,7 @@
 #define FORMAT_LITTLEFS_IF_FAILED true
 #define MILLIS_PER_SECOND 1000UL
 #define WIFI_CONNECT_TIMEOUT (MILLIS_PER_SECOND * 60)
+#define CONFIG_TZ_DELAY (MILLIS_PER_SECOND * 3)
 #define NTP_SERVER "pool.ntp.org"
 #define TZ "<-03>3"
 
@@ -26,8 +27,8 @@ static const char APPLICATION_JSON[] PROGMEM = "application/json";
 bool mountFS();
 time_t now();
 time_t uptime();
-void printFormattedTime(time_t *t);
-void printLocalDateTime();
+void printLocalTimeFmt(time_t *t);
+void printLocalTime();
 void printMAC(const uint8_t *mac_addr);
 int str2mac(const char *mac, uint8_t *values);
 uint8_t dBm2Quality(const int16_t dBm);

@@ -22,11 +22,11 @@ time_t now() { return time(nullptr); }
 
 time_t uptime() { return (time_t)(millis() / 1000); }
 
-void printFormattedTime(time_t *t) { Serial.print(asctime(localtime(&*t))); }
+void printLocalTimeFmt(time_t *t) { Serial.print(asctime(localtime(&*t))); }
 
-void printLocalDateTime() {
+void printLocalTime() {
   time_t now = time(nullptr);
-  printFormattedTime(&now);
+  printLocalTimeFmt(&now);
 }
 
 void printMAC(const uint8_t *mac_addr) {
@@ -93,16 +93,20 @@ void WifiClass::initSTA() {
   Serial.print(F("Connecting"));
   while (!WiFi.isConnected() && millis() <= WIFI_CONNECT_TIMEOUT) {
     Serial.print(F("."));
-    delay(500);
+    delay(300);
   }
-
+  Serial.println();
   _isSTAEnabled = true;
+
   configTzTime(_tz, _ntpServer);
+  delay(CONFIG_TZ_DELAY);
+  Serial.print(F("Local Time:         "));
+  printLocalTime();
+
   ArduinoOTA.setHostname((const char *)_hostname);
   ArduinoOTA.setPassword((const char *)_otaPass);
   ArduinoOTA.begin();
 
-  Serial.println();
   Serial.print(F("IP Address:         "));
   Serial.println(WiFi.localIP());
 

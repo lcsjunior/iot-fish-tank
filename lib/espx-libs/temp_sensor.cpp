@@ -8,10 +8,8 @@ void DSTempSensor::setup(const byte pin) {
 float DSTempSensor::getCTemp() {
   _sensors.requestTemperatures();
   float cTemp = _sensors.getTempCByIndex(0);
-#if DEBUG
   if (cTemp == DEVICE_DISCONNECTED_C) {
     Serial.println(F("Error: Could not read temperature data"));
   }
-#endif
   return cTemp;
 }
