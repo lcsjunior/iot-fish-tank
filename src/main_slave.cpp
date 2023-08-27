@@ -77,7 +77,7 @@ void loop() {
   delay(300);
 }
 
-void callbackData(uint8_t *incomingData, uint8_t len) {
+void nowDataCallback(uint8_t *incomingData, uint8_t len) {
   memcpy_P(&incomingReadings, incomingData, sizeof(incomingReadings));
   switch (incomingReadings.cmd) {
   case NONE:
