@@ -7,9 +7,6 @@
 #include <PubSubClient.h>
 #include <NoDelay.h>
 
-#define MQTT_TOPIC_BUFFER_SIZE 64
-#define MQTT_MSG_BUFFER_SIZE 128
-
 uint8_t peer49[6] = PEER49;
 uint8_t peer63[6] = PEER63;
 
@@ -27,8 +24,8 @@ PubSubClient mqttClient(espClient);
 
 noDelay mqttRetryConnectTime(MILLIS_PER_SECOND * 5);
 
-char topic[MQTT_TOPIC_BUFFER_SIZE];
-char msg[MQTT_MSG_BUFFER_SIZE];
+char topic[32];
+char msg[255];
 
 void mqttSubscriptionCallback(char *topic, byte *payload, unsigned int length);
 void mqttConnect();
@@ -122,17 +119,18 @@ void mqttConnect() {
 }
 
 void mqttSubscribe(long subChannelId) {
-  snprintf_P(topic, MQTT_TOPIC_BUFFER_SIZE, "channels/%ld/subscribe",
-             subChannelId);
+  snprintf_P(topic, sizeof(topic), "channels/%ld/subscribe", subChannelId);
   mqttClient.subscribe(topic);
 }
 
 void mqttPublish(long pubChannelId) {
-  snprintf_P(topic, MQTT_TOPIC_BUFFER_SIZE, "channels/%ld/publish",
-             pubChannelId);
-  // Serial.print(topic);
-  // Serial.print(F("    "));
-  // Serial.println(msg);
+  snprintf_P(topic, sizeof(topic), "channels/%ld/publish", pubChannelId);
+  Serial.print(topic);
+  Serial.print(F(" - "));
+  Serial.print(msg);
+  Serial.print(F(" ("));
+  Serial.print(sizeof(msg));
+  Serial.println(F(" bytes)"));
   mqttClient.publish(topic, msg);
 }
 
@@ -147,7 +145,7 @@ void nowDataCallback(uint8_t *incomingData, uint8_t len) {
   //                 incomingReadings.thermostat, incomingReadings.cTemp,
   //                 incomingReadings.isHeaterOn, incomingReadings.isLedOn);
 
-  snprintf_P(msg, MQTT_MSG_BUFFER_SIZE,
+  snprintf_P(msg, sizeof(msg),
              "field1=%.1f&field2=%.1f&field3=%.1f&field4=%d&field5=%d",
              incomingReadings.cTemp, incomingReadings.setpoint,
              incomingReadings.hysteresis, incomingReadings.isHeaterOn,
