@@ -92,7 +92,7 @@ void OnDataRecv(const uint8_t *mac_addr, const uint8_t *incomingData, int len) {
     break;
   case DATA:
     memcpy_P(&incomingData_, incomingData, sizeof(incomingData_));
-    callbackData(incomingData_, len);
+    nowDataCallback(incomingData_, len);
     break;
   }
 }

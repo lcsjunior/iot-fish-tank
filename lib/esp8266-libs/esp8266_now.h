@@ -10,7 +10,7 @@
 #define MAX_CHANNEL 13
 #define PAIR_CONNECT_TIMEOUT (MILLIS_PER_SECOND * 5)
 
-void callbackData(uint8_t *incomingData, uint8_t len);
+void nowDataCallback(uint8_t *incomingData, uint8_t len);
 
 enum PairingStatus {
   NOT_PAIRED,

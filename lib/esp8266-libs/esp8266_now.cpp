@@ -90,7 +90,7 @@ void OnDataRecv(uint8_t *mac, uint8_t *incomingData, uint8_t len) {
 #endif
     break;
   case DATA:
-    callbackData(incomingData, len);
+    nowDataCallback(incomingData, len);
     break;
   }
 }

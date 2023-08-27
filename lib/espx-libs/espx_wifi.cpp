@@ -89,17 +89,24 @@ void WifiClass::initSTA() {
   sprintf_P(_hostname, "esp32-%06x", _chipId);
 #endif
   WiFi.setHostname(_hostname);
+
   WiFi.begin(_ssid, _pass);
   Serial.print(F("Connecting"));
-  while (!WiFi.isConnected() && millis() <= WIFI_CONNECT_TIMEOUT) {
+  unsigned long currentMillis = millis();
+  while (!WiFi.isConnected() &&
+         (millis() - currentMillis) <= WIFI_CONNECT_TIMEOUT) {
+    Serial.print(F("."));
+    delay(300);
+  }
+  _isSTAEnabled = true;
+
+  configTzTime(_tz, _ntpServer);
+  currentMillis = millis();
+  while ((millis() - currentMillis) <= CONFIG_TZ_DELAY) {
     Serial.print(F("."));
     delay(300);
   }
   Serial.println();
-  _isSTAEnabled = true;
-
-  configTzTime(_tz, _ntpServer);
-  delay(CONFIG_TZ_DELAY);
   Serial.print(F("Local Time:         "));
   printLocalTime();
 

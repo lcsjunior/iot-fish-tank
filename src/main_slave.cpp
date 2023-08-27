@@ -3,7 +3,7 @@
 #include <relay.h>
 #include <temp_sensor.h>
 
-#define EVENT_INTERVAL (MILLIS_PER_SECOND * 15)
+#define EVENT_INTERVAL (MILLIS_PER_SECOND * 30)
 
 unsigned long lastEventTime = 0;
 
