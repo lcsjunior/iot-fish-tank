@@ -56,7 +56,7 @@ uint8_t dBm2Quality(const int16_t dBm) {
 
 void WifiClass::initAP() {
   char apSsid[32];
-  sprintf_P(apSsid, "ESPsoftAP-%06x", _chipId);
+  sprintf_P(apSsid, "ESPsoftAP-%06x", getChipId());
 
   Serial.print(F("Setting soft-AP configuration... "));
   Serial.println(WiFi.softAPConfig(apIP, apIP, subnet) ? F("Ready")
@@ -84,9 +84,9 @@ void WifiClass::initAP() {
 
 void WifiClass::initSTA() {
 #if defined(ESP8266)
-  sprintf_P(_hostname, "esp8266-%06x", _chipId);
+  sprintf_P(_hostname, "esp8266-%06x", getChipId());
 #else
-  sprintf_P(_hostname, "esp32-%06x", _chipId);
+  sprintf_P(_hostname, "esp32-%06x", getChipId());
 #endif
   WiFi.setHostname(_hostname);
 

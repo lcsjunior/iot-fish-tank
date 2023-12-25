@@ -4,6 +4,7 @@ Config config;
 const char *filename = "/config.json";
 
 bool loadConfigFile() {
+  LittleFS.remove(filename);
   File file = LittleFS.open(filename, "r");
   if (!file) {
     Serial.println(F("Failed to open config file"));
