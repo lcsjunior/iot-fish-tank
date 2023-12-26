@@ -42,11 +42,9 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
   digitalWrite(LED_BUILTIN, HIGH);
 
-#if defined(ESP8266)
   led.setup(D5);
   heater.setup(D6);
   tempSensor.setup(D7);
-#endif
 
   mountFS();
   if (!loadConfigFile()) {
@@ -55,7 +53,6 @@ void setup() {
     config.hysteresis = 0.5;
   }
   saveConfigFile();
-  printConfigFile();
 
   thermostat.setup(config.setpoint, config.hysteresis, 0, 30);
 
@@ -75,10 +72,8 @@ void loop() {
   Wifi.loop();
   Cron.delay();
 
-#if defined(ESP8266)
   cTemp = tempSensor.getCTemp();
   thermostat.handleHeater(cTemp);
-#endif
 
   if (!mqttClient.connected() && mqttConnectTime.update()) {
     Serial.println(F("Reconnecting to MQTT..."));

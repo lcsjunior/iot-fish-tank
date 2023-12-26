@@ -4,7 +4,6 @@ Config config;
 const char *filename = "/config.json";
 
 bool loadConfigFile() {
-  LittleFS.remove(filename);
   File file = LittleFS.open(filename, "r");
   if (!file) {
     Serial.println(F("Failed to open config file"));
@@ -34,6 +33,8 @@ void saveConfigFile() {
     Serial.println(F("Failed to serialize configuration"));
   }
 }
+
+void removeConfigFile() { LittleFS.remove(filename); }
 
 void printConfigFile() {
   File file = LittleFS.open(filename, "r");

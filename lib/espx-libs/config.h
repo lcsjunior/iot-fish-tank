@@ -16,6 +16,7 @@ extern Config config;
 
 bool loadConfigFile();
 void saveConfigFile();
+void removeConfigFile();
 void printConfigFile();
 
 #endif // CONFIG_H
