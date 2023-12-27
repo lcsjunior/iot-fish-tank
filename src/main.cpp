@@ -22,6 +22,7 @@ unsigned long channelId = CH_ID;
 
 char topic[32];
 char msg[255];
+char status[64];
 
 const char *cronstr_at_8am = "0 0 8 * * *";
 const char *cronstr_at_15pm = "0 0 15 * * *";
@@ -35,6 +36,7 @@ float cTemp;
 void mqttConnect();
 void mqttSubscribe();
 void mqttPublish();
+void updateStatus();
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
@@ -82,9 +84,12 @@ void loop() {
   mqttClient.loop();
 
   if (mqttPubTime.update()) {
-    snprintf_P(msg, sizeof(msg),
-               "field1=%.1f&field2=%.1f&field3=%.1f&field4=%d&field5=%d", cTemp,
-               config.setpoint, config.hysteresis, heater.isOn(), led.isOn());
+    updateStatus();
+    snprintf_P(
+        msg, sizeof(msg),
+        "field1=%.1f&field2=%.1f&field3=%.1f&field4=%d&field5=%d&status=%s",
+        cTemp, config.setpoint, config.hysteresis, heater.isOn(), led.isOn(),
+        status);
     mqttPublish();
   }
 
@@ -110,4 +115,13 @@ void mqttPublish() {
   Serial.print(sizeof(msg));
   Serial.println(F(" bytes)"));
   mqttClient.publish(topic, msg);
+}
+
+void updateStatus() {
+  char buf[64];
+  time_t now = time(nullptr);
+  struct tm *timeinfo;
+  timeinfo = localtime(&now);
+  strftime(buf, sizeof(buf), "%b %d %Y %H:%M:%S", timeinfo);
+  snprintf_P(status, sizeof(status), "Last Updated: %s", buf);
 }
