@@ -19,6 +19,7 @@
 #define CONFIG_TZ_DELAY (MILLIS_PER_SECOND * 3)
 #define NTP_SERVER "pool.ntp.org"
 #define TZ "<-03>3"
+#define DATETIME_FORMAT "%Y-%m-%d %H:%M:%S"
 
 static const char TEXT_PLAIN[] PROGMEM = "text/plain";
 static const char TEXT_HTML[] PROGMEM = "text/html";

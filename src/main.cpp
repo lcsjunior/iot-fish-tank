@@ -36,7 +36,6 @@ float cTemp;
 void mqttConnect();
 void mqttSubscribe();
 void mqttPublish();
-void updateStatus();
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
@@ -86,8 +85,7 @@ void loop() {
   if (mqttPubTime.update()) {
     char buf[64];
     getLocalTimeFmt(buf, sizeof(buf));
-    snprintf_P(status, sizeof(status), "PUB %s - RSSI %d dBm / %d%%", buf,
-               WiFi.RSSI(), dBm2Quality(WiFi.RSSI()));
+    snprintf_P(status, sizeof(status), "PUB %s", buf);
     snprintf_P(
         msg, sizeof(msg),
         "field1=%.1f&field2=%.1f&field3=%.1f&field4=%d&field5=%d&status=%s",
@@ -115,7 +113,7 @@ void mqttPublish() {
   Serial.print(F(" - "));
   Serial.print(msg);
   Serial.print(F(" ("));
-  Serial.print(sizeof(msg));
+  Serial.print(strnlen_P(msg, sizeof(msg)));
   Serial.println(F(" bytes)"));
   mqttClient.publish(topic, msg);
 }

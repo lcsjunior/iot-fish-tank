@@ -26,7 +26,7 @@ void getLocalTimeFmt(char *buf, size_t len) {
   time_t now = time(nullptr);
   struct tm *timeinfo;
   timeinfo = localtime(&now);
-  strftime(buf, len, "%b %d %Y %H:%M:%S", timeinfo);
+  strftime(buf, len, DATETIME_FORMAT, timeinfo);
 }
 
 void printLocalTime() {
