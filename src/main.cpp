@@ -84,7 +84,10 @@ void loop() {
   mqttClient.loop();
 
   if (mqttPubTime.update()) {
-    updateStatus();
+    char buf[64];
+    getLocalTimeFmt(buf, sizeof(buf));
+    snprintf_P(status, sizeof(status), "PUB %s - RSSI %d dBm / %d%%", buf,
+               WiFi.RSSI(), dBm2Quality(WiFi.RSSI()));
     snprintf_P(
         msg, sizeof(msg),
         "field1=%.1f&field2=%.1f&field3=%.1f&field4=%d&field5=%d&status=%s",
@@ -115,13 +118,4 @@ void mqttPublish() {
   Serial.print(sizeof(msg));
   Serial.println(F(" bytes)"));
   mqttClient.publish(topic, msg);
-}
-
-void updateStatus() {
-  char buf[64];
-  time_t now = time(nullptr);
-  struct tm *timeinfo;
-  timeinfo = localtime(&now);
-  strftime(buf, sizeof(buf), "%b %d %Y %H:%M:%S", timeinfo);
-  snprintf_P(status, sizeof(status), "Last Updated: %s", buf);
 }

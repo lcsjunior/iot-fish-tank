@@ -22,11 +22,17 @@ time_t now() { return time(nullptr); }
 
 time_t uptime() { return (time_t)(millis() / 1000); }
 
-void printLocalTimeFmt(time_t *t) { Serial.print(asctime(localtime(&*t))); }
+void getLocalTimeFmt(char *buf, size_t len) {
+  time_t now = time(nullptr);
+  struct tm *timeinfo;
+  timeinfo = localtime(&now);
+  strftime(buf, len, "%b %d %Y %H:%M:%S", timeinfo);
+}
 
 void printLocalTime() {
-  time_t now = time(nullptr);
-  printLocalTimeFmt(&now);
+  char buf[32];
+  getLocalTimeFmt(buf, sizeof(buf));
+  Serial.println(buf);
 }
 
 void printMAC(const uint8_t *mac_addr) {
@@ -128,10 +134,9 @@ void WifiClass::initSTA() {
   _channel = WiFi.channel();
 
   Serial.print(F("Signal Strength:    "));
-  uint8_t dBm = WiFi.RSSI();
-  Serial.print(dBm);
+  Serial.print(WiFi.RSSI());
   Serial.print(F(" dBm / "));
-  Serial.print(dBm2Quality(dBm));
+  Serial.print(dBm2Quality(WiFi.RSSI()));
   Serial.println(F("%"));
 }
 
