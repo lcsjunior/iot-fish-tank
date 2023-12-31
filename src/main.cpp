@@ -2,6 +2,7 @@
 #include <PubSubClient.h>
 #include <CronAlarms.h>
 #include <NoDelay.h>
+#include <ESP8266WebServer.h>
 #include <secrets.h>
 #include <config.h>
 #include <espx_wifi.h>
@@ -14,6 +15,7 @@
 
 WiFiClient espClient;
 PubSubClient mqttClient(espClient);
+ESP8266WebServer server(80);
 
 noDelay mqttConnectTime(MQTT_CONNECT_TIMEOUT);
 noDelay mqttPubTime(MQTT_PUB_TIMEOUT);
@@ -36,6 +38,7 @@ float cTemp;
 void mqttConnect();
 void mqttSubscribe();
 void mqttPublish();
+void initWebServer();
 
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
@@ -67,6 +70,8 @@ void setup() {
   Cron.create((char *)cronstr_at_8am, []() { led.turnOn(); }, false);
 
   Cron.create((char *)cronstr_at_15pm, []() { led.turnOff(); }, false);
+
+  initWebServer();
 }
 
 void loop() {
@@ -94,6 +99,8 @@ void loop() {
     mqttPublish();
   }
 
+  server.handleClient();
+
   delay(300);
 }
 
@@ -116,4 +123,41 @@ void mqttPublish() {
   Serial.print(strnlen_P(msg, sizeof(msg)));
   Serial.println(F(" bytes)"));
   mqttClient.publish(topic, msg);
+}
+
+void initWebServer() {
+  server.on(F("/"), []() {
+    server.send(200, FPSTR(TEXT_PLAIN), FPSTR("hello from ESP!"));
+  });
+
+  server.on(F("/stats"), []() {
+    uint32_t free;
+    uint16_t max;
+    uint8_t frag;
+    ESP.getHeapStats(&free, &max, &frag);
+    char buf[64];
+    snprintf_P(buf, sizeof(buf), PSTR("free: %7u - max: %7u - frag: %3d%% <- "),
+               free, max, frag);
+    server.send(200, FPSTR(TEXT_PLAIN), FPSTR(buf));
+  });
+
+  server.on(F("/reboot"), []() {
+    Wifi.reboot();
+    server.send(200);
+  });
+
+  server.on(F("/led/toggle"), []() {
+    led.toggle();
+    server.send(200);
+  });
+
+  server.on(F("/msg"), []() {
+    server.send(200, FPSTR(TEXT_PLAIN), FPSTR(msg));
+  });
+
+  server.onNotFound(
+      []() { server.send(404, FPSTR(TEXT_PLAIN), FPSTR("File not found")); });
+
+  server.begin();
+  Serial.println(F("HTTP server started"));
 }
