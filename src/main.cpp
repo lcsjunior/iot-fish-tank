@@ -24,7 +24,7 @@ unsigned long channelId = CH_ID;
 
 char topic[32];
 char msg[255];
-char status[64];
+char status[96];
 
 const char *cronstr_at_8am = "0 0 8 * * *";
 const char *cronstr_at_15pm = "0 0 15 * * *";
@@ -90,12 +90,13 @@ void loop() {
   if (mqttPubTime.update()) {
     char buf[64];
     getLocalTimeFmt(buf, sizeof(buf));
-    snprintf_P(status, sizeof(status), "PUB %s", buf);
-    snprintf_P(
-        msg, sizeof(msg),
-        "field1=%.1f&field2=%.1f&field3=%.1f&field4=%d&field5=%d&status=%s",
-        cTemp, config.setpoint, config.hysteresis, heater.isOn(), led.isOn(),
-        status);
+    snprintf_P(status, sizeof(status), PSTR("PUB %s RSSI %d dBm (%d pcent)"),
+               buf, WiFi.RSSI(), dBm2Quality(WiFi.RSSI()));
+    snprintf_P(msg, sizeof(msg),
+               PSTR("field1=%.1f&field2=%.1f&field3=%.1f&field4=%d&field5=%d&"
+                    "status=%s"),
+               cTemp, config.setpoint, config.hysteresis, heater.isOn(),
+               led.isOn(), status);
     mqttPublish();
   }
 
@@ -110,12 +111,12 @@ void mqttConnect() {
 }
 
 void mqttSubscribe() {
-  snprintf_P(topic, sizeof(topic), "channels/%ld/subscribe", channelId);
+  snprintf_P(topic, sizeof(topic), PSTR("channels/%ld/subscribe"), channelId);
   mqttClient.subscribe(topic);
 }
 
 void mqttPublish() {
-  snprintf_P(topic, sizeof(topic), "channels/%ld/publish", channelId);
+  snprintf_P(topic, sizeof(topic), PSTR("channels/%ld/publish"), channelId);
   Serial.print(topic);
   Serial.print(F(" - "));
   Serial.print(msg);
@@ -152,7 +153,10 @@ void initWebServer() {
   });
 
   server.on(F("/msg"), []() {
-    server.send(200, FPSTR(TEXT_PLAIN), FPSTR(msg));
+    char buf[sizeof(msg) + 32];
+    size_t len = strnlen_P(msg, sizeof(msg));
+    snprintf_P(buf, sizeof(buf), PSTR("%s (%zd bytes)"), msg, len);
+    server.send(200, FPSTR(TEXT_PLAIN), FPSTR(buf));
   });
 
   server.onNotFound(

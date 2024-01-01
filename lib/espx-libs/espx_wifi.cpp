@@ -37,7 +37,7 @@ void printLocalTime() {
 
 void printMAC(const uint8_t *mac_addr) {
   char macStr[18];
-  snprintf_P(macStr, sizeof(macStr), "%02x:%02x:%02x:%02x:%02x:%02x",
+  snprintf_P(macStr, sizeof(macStr), PSTR("%02x:%02x:%02x:%02x:%02x:%02x"),
              mac_addr[0], mac_addr[1], mac_addr[2], mac_addr[3], mac_addr[4],
              mac_addr[5]);
   Serial.print(macStr);
